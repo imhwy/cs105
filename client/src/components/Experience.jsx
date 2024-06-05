@@ -8,6 +8,7 @@ import { AnimatedWoman } from "./AnimatedWoman";
 import { Item } from "./Item";
 import { charactersAtom, mapAtom, socket, userAtom } from "./SocketManager";
 import { buildModeAtom, draggedItemAtom, draggedItemRotationAtom } from "./UI";
+import { DirectionalLightHelper } from 'three';
 export const Experience = () => {
   const [buildMode, setBuildMode] = useAtom(buildModeAtom);
   const [characters] = useAtom(charactersAtom);
@@ -59,9 +60,9 @@ export const Experience = () => {
     }
     const item = items[draggedItem];
     const width =
-      item.rotation === 1 || item.rotation === 3 ? item.size[1] : item.size[0];
+      draggedItem.rotation === 1 || draggedItemRotation === 3 ? item.size[1] : item.size[0];
     const height =
-      item.rotation === 1 || item.rotation === 3 ? item.size[0] : item.size[1];
+      draggedItem.rotation === 1 || draggedItemRotation === 3 ? item.size[0] : item.size[1];
 
     let droppable = true;
 
@@ -112,7 +113,7 @@ export const Experience = () => {
     }
 
     setCanDrop(droppable);
-  }, [dragPosition, draggedItem, items]);
+  }, [dragPosition, draggedItem, items, draggedItemRotation]);
   const controls = useRef();
   const state = useThree((state) => state);
 
@@ -128,8 +129,30 @@ export const Experience = () => {
 
   return (
     <>
-      <Environment preset="sunset" />
+      <Environment preset="apartment" />
       <ambientLight intensity={0.3} />
+      {/* <directionalLight color={0xff00ff} intensity ={0.8}/> */}
+      {/* <directionalLightHelper light={directionalLight}/> */}
+      {/* <directionalLight
+        //ref={directionalLightRef}
+        position={[10, 10, 10]}
+        intensity={0.8}
+        color={0xff00ff}
+      /> */}
+     <directionalLight
+        color={0xffff00}
+        position={[-4, 4, -4]}
+        castShadow
+        intensity={0.8}
+        shadow-mapSize={[1024, 1024]}
+        
+      >
+        <orthographicCamera
+          attach={"shadow-camera"}
+          args={[-map.size[0], map.size[1], 10, -10]}
+          far={map.size[0] + map.size[1]}
+        />
+      </directionalLight>
       <OrbitControls
         ref={controls}
         minDistance={5}
@@ -176,11 +199,14 @@ export const Experience = () => {
         }}
         position-x={map.size[0] / 2}
         position-z={map.size[1] / 2}
+        receiveShadow
       >
         <planeGeometry args={map.size} />
         <meshStandardMaterial color="#f0f0f0" />
       </mesh>
+     
       <Grid infiniteGrid fadeDistance={50} fadeStrength={5} />
+      
       {!buildMode &&
         characters.map((character) => (
           <AnimatedWoman

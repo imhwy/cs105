@@ -23,6 +23,18 @@
         "vertical_position": 10
       },
       "rotation": 2
+    },
+    {
+      "name": "Object_3",
+      "size": {
+        "horizontal_size": 3,
+        "vertical_size": 3
+      },
+      "position": {
+        "horizontal_position": 6,
+        "vertical_position": 6
+      },
+      "rotation": 2
     }
   ]
 }
