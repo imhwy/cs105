@@ -1,6 +1,10 @@
 import pathfinding from "pathfinding";
 import { Server } from "socket.io";
 import fs from 'fs/promises';
+import path from 'path';
+import { readJsonFiles, writeCombinedJson, clearOutputFile } from './jsonCombiner.js';
+import { Console } from "console";
+
 const io = new Server({
   cors: {
     origin: "http://localhost:5173",
@@ -12,6 +16,17 @@ io.listen(3001);
 const characters = [];
 
 // PhucDanh code trong hoảng loạn
+// Specify the folder containing the JSON files
+const folderPath = 'data';
+const outputFilePath = 'data.json';
+
+
+await clearOutputFile(outputFilePath);
+const allData = await readJsonFiles(folderPath);
+const message = await writeCombinedJson(outputFilePath, allData);
+
+console.log(message);
+
 async function readJsonFile(filePath) {
   try {
     const data = await fs.readFile(filePath, 'utf8');
@@ -24,7 +39,7 @@ async function readJsonFile(filePath) {
 
 async function exampleUsage() {
   try {
-    const jsonData = await readJsonFile('D:/UIT/HK6-III/CS105.O21/FinalProject/r3f-sims-online-part-4/data.json');
+    const jsonData = await readJsonFile('D:/UIT/HK6-III/CS105.O21/FinalProject/cs105/server/data.json');
     return jsonData;
   } catch (error) {
     console.error("Failed to read JSON file:", error);
@@ -36,23 +51,24 @@ console.log(data);
 
 async function loadItemsFromJson() {
   try {
-      const items = {};
+    const items = {};
 
-      data.data.forEach((obj) => {
-          const itemName = obj.name;
-          items[itemName] = {
-              name: obj.name,
-              size: [obj.size.horizontal_size, obj.size.vertical_size]
-          };
-      });
-      return Object(items);
+    data.data.forEach((obj) => {
+      const itemName = obj.name;
+      items[itemName] = {
+        name: obj.name,
+        size: [obj.size.horizontal_size, obj.size.vertical_size]
+      };
+    });
+    return Object(items);
   } catch (error) {
-      console.error("Failed to load items from JSON:", error);
-      return null;
+    console.error("Failed to load items from JSON:", error);
+    return null;
   }
 }
 
 const items_addition = await loadItemsFromJson()
+console.log(items_addition)
 
 const items = {
   washer: {
@@ -320,7 +336,7 @@ const items = {
 async function createMapItems(items) {
   try {
     const mapItems = [];
-    data.data.forEach(obj=> {
+    data.data.forEach(obj => {
       const item = {
         ...items[obj.name],
         gridPosition: [
@@ -578,6 +594,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("itemsUpdate", (items) => {
+    
     map.items = items;
     characters.forEach((character) => {
       character.path = [];

@@ -1,0 +1,12 @@
+{
+  "name": "Object_2",
+  "size": {
+    "horizontal_size": 1,
+    "vertical_size": 1
+  },
+  "position": {
+    "horizontal_position": 10,
+    "vertical_position": 10
+  },
+  "rotation": 2
+}
